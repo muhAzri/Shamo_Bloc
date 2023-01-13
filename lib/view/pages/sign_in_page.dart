@@ -127,6 +127,8 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                     );
+              } else {
+                showSnackbar(context, 'Email Atau Password Tidak Boleh Kosong');
               }
             },
           ),

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shamo/models/category_model.dart';
 
 import '../../shared/theme.dart';
 
 class CategoriesItem extends StatelessWidget {
-  final String title;
+  final CategoryModel category;
   final bool isSelected;
 
   const CategoriesItem({
     super.key,
-    required this.title,
     this.isSelected = false,
+    required this.category,
   });
 
   @override
@@ -24,7 +25,7 @@ class CategoriesItem extends StatelessWidget {
       ),
       decoration: _buildDecoration(),
       child: Text(
-        title,
+        category.name!,
         style: _buildTextStyle(),
       ),
     );

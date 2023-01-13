@@ -146,7 +146,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 );
               } else {
-                showSnackbar(context, 'Something Wrong');
+                showSnackbar(context, 'Form Tidak Boleh Kosong');
               }
             },
           ),
