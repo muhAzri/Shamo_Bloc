@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shamo/shared/theme.dart';
 
+import '../../models/product_model.dart';
+
 class PopularItem extends StatelessWidget {
-  const PopularItem({super.key});
+  final ProductModel popularProduct;
+  final VoidCallback? onTap;
+
+  const PopularItem({
+    super.key,
+    required this.popularProduct,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +20,7 @@ class PopularItem extends StatelessWidget {
 
   Widget _buildPopularItem(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/product');
-      },
+      onTap: onTap,
       child: Container(
         width: 215,
         height: 278,
@@ -29,15 +36,18 @@ class PopularItem extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildProductImage(), _buildProductInfo()],
+          children: [
+            _buildProductImage(),
+            _buildProductInfo(),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildProductImage() {
-    return Image.asset(
-      'assets/images/shoes.png',
+    return Image.network(
+      popularProduct.galleries[0].url!,
       width: 215,
       height: 150,
       fit: BoxFit.cover,
@@ -68,19 +78,20 @@ class PopularItem extends StatelessWidget {
 
   Widget _buildProductHiking() {
     return Text(
-      'Hiking',
+      popularProduct.category!.name!,
       style: lightGreyTextStyle.copyWith(
         fontWeight: light,
       ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
   Widget _buildProductTitle() {
     return Text(
-      'COURT VISION 2.0',
+      popularProduct.name!,
       style: blackTextStyle.copyWith(
         fontSize: 18,
-        fontWeight: semiBold,
       ),
       overflow: TextOverflow.ellipsis,
     );
@@ -88,7 +99,7 @@ class PopularItem extends StatelessWidget {
 
   Widget _buildProductPrice() {
     return Text(
-      '\$58,67',
+      '\$${popularProduct.price}',
       style: priceTextStyle.copyWith(
         fontWeight: medium,
       ),

@@ -9,8 +9,25 @@ import 'package:shamo/view/widgets/product_item.dart';
 
 import '../../../blocs/product/product_bloc.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final TextEditingController querry = TextEditingController(text: '');
+  late CategoryModel selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCategory = CategoryModel(
+      name: 'All Shoes',
+    );
+    querry.text = 6.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,22 +96,25 @@ class HomePage extends StatelessWidget {
             child: BlocBuilder<ProductBloc, ProductState>(
               builder: (context, state) {
                 if (state is CategoriesSuccess) {
+                  state.categories.sort((a, b) => b.id - a.id);
+                  selectedCategory = state.categories.first;
                   return Row(
-                    children: [
-                      CategoriesItem(
-                        category: CategoryModel(name: 'All Shoes'),
-                        isSelected: true,
-                      ),
-                      Row(
-                        children: state.categories
-                            .map(
-                              (category) => CategoriesItem(
-                                category: category,
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ],
+                    children: state.categories
+                        .map(
+                          (category) => CategoriesItem(
+                            category: category,
+                            isSelected: selectedCategory == category,
+                            onTap: (category) {
+                              setState(
+                                () {
+                                  selectedCategory = category;
+                                  querry.text = selectedCategory.id.toString();
+                                },
+                              );
+                            },
+                          ),
+                        )
+                        .toList(),
                   );
                 }
                 return const Center(
@@ -126,17 +146,26 @@ class HomePage extends StatelessWidget {
               ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: const [
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                    PopularItem(),
-                  ],
+                child: BlocProvider(
+                  create: (context) => ProductBloc()..add(GetPopularProduct()),
+                  child: BlocBuilder<ProductBloc, ProductState>(
+                    builder: (context, state) {
+                      if (state is ProductFailed) {}
+                      if (state is ProductSucces) {
+                        return Row(
+                          children: state.products
+                              .map(
+                                (popularProduct) =>
+                                    PopularItem(popularProduct: popularProduct),
+                              )
+                              .toList(),
+                        );
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

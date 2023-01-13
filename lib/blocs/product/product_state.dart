@@ -29,4 +29,13 @@ class CategoriesSuccess extends ProductState {
   List<Object> get props => ['categories'];
 }
 
-class ProductSucces extends ProductState {}
+class ProductSucces extends ProductState {
+  final List<ProductModel> products;
+
+  const ProductSucces(this.products);
+
+  @override
+  List<Object> get props => ['products'];
+
+  
+}
