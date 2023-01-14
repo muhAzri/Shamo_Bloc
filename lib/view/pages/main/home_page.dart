@@ -131,17 +131,21 @@ class _HomePageState extends State<HomePage> {
 
     Widget popularProduct() {
       return Container(
-        margin: EdgeInsets.only(top: defaultMargin),
+        margin: querry.text != '6'
+            ? EdgeInsets.zero
+            : EdgeInsets.only(top: defaultMargin),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Popular Products',
-              style: whiteTextStyle.copyWith(
-                fontSize: 22,
-                fontWeight: semiBold,
-              ),
-            ),
+            querry.text != '6'
+                ? Container()
+                : Text(
+                    'Popular Products',
+                    style: whiteTextStyle.copyWith(
+                      fontSize: 22,
+                      fontWeight: semiBold,
+                    ),
+                  ),
             Container(
               margin: const EdgeInsets.only(
                 top: 14,
@@ -158,24 +162,28 @@ class _HomePageState extends State<HomePage> {
                         });
                       }
                       if (state is ProductSucces) {
-                        return Row(
-                          children: state.products
-                              .map(
-                                (popularProduct) => PopularItem(
-                                  popularProduct: popularProduct,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProductPage(
-                                            product: popularProduct),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                              .toList(),
-                        );
+                        if (querry.text == '6') {
+                          return Row(
+                            children: state.products
+                                .map(
+                                  (popularProduct) => PopularItem(
+                                    popularProduct: popularProduct,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProductPage(
+                                              product: popularProduct),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        } else {
+                          return Container();
+                        }
                       }
                       return const Center(
                         child: CircularProgressIndicator(),
