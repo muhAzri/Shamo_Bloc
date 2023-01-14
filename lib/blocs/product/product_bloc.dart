@@ -44,6 +44,23 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
             );
           }
         }
+        if (event is GetProdcuts) {
+          try {
+            emit(ProductLoading());
+
+            final products = await ProductService().getProduct();
+
+            emit(
+              ProductSucces(products),
+            );
+          } catch (e) {
+            emit(
+              ProductFailed(
+                e.toString(),
+              ),
+            );
+          }
+        }
       },
     );
   }

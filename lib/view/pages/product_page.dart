@@ -1,18 +1,25 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shamo/shared/method.dart';
 
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/view/widgets/buttons.dart';
+import '../../blocs/product/product_bloc.dart';
+import '../../models/product_model.dart';
 
 class ProductPage extends StatefulWidget {
-  const ProductPage({super.key});
+  final ProductModel product;
+  const ProductPage({super.key, required this.product});
 
   @override
-  State<ProductPage> createState() => _ProductPageState();
+  State<ProductPage> createState() => _ProductPageState(product);
 }
 
 class _ProductPageState extends State<ProductPage> {
+  final ProductModel product;
+
   List images = [
     'assets/images/shoes.png',
     'assets/images/shoes.png',
@@ -30,6 +37,8 @@ class _ProductPageState extends State<ProductPage> {
 
   int currentIndex = 0;
   bool isWishlist = false;
+
+  _ProductPageState(this.product);
 
   @override
   Widget build(BuildContext context) {
@@ -123,18 +132,6 @@ class _ProductPageState extends State<ProductPage> {
     );
   }
 
-  Widget familiarShoesCard(String anotherShoes) {
-    return Container(
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
-      child: Image.asset(
-        anotherShoes,
-        width: 54,
-        height: 54,
-      ),
-    );
-  }
-
   Widget header() {
     int index = -1;
 
@@ -166,10 +163,10 @@ class _ProductPageState extends State<ProductPage> {
           ),
         ),
         CarouselSlider(
-          items: images
+          items: product.galleries
               .map(
-                (image) => Image.asset(
-                  image,
+                (image) => CachedNetworkImage(
+                  imageUrl: image.url!,
                   width: MediaQuery.of(context).size.width,
                   height: 330,
                   fit: BoxFit.cover,
@@ -190,13 +187,14 @@ class _ProductPageState extends State<ProductPage> {
           height: 20,
         ),
         Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: images.map(
-              (image) {
-                index++;
-                return indicator(index);
-              },
-            ).toList())
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: product.galleries.map(
+            (image) {
+              index++;
+              return indicator(index);
+            },
+          ).toList(),
+        )
       ],
     );
   }
@@ -210,7 +208,7 @@ class _ProductPageState extends State<ProductPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'TERREX URBAN LOW',
+                  product.name!,
                   style: whiteTextStyle.copyWith(
                     fontSize: 18,
                     fontWeight: semiBold,
@@ -218,7 +216,7 @@ class _ProductPageState extends State<ProductPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  'Hiking',
+                  product.category!.name!,
                   style: lightGreyTextStyle.copyWith(
                     fontSize: 12,
                   ),
@@ -257,7 +255,7 @@ class _ProductPageState extends State<ProductPage> {
               style: whiteTextStyle,
             ),
             Text(
-              '\$143,98',
+              '\$${product.price}',
               style: priceTextStyle.copyWith(
                 fontSize: 16,
                 fontWeight: semiBold,
@@ -284,7 +282,7 @@ class _ProductPageState extends State<ProductPage> {
               height: 12,
             ),
             Text(
-              'Unpaved trails and mixed surfaces are easy when you have the traction and support you need. Casual enough for the daily commute.',
+              product.description!,
               style: lightGreyTextStyle,
               textAlign: TextAlign.justify,
               maxLines: 5,
@@ -307,10 +305,35 @@ class _ProductPageState extends State<ProductPage> {
             const SizedBox(height: 12),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: familiarShoes.map((anotherShoes) {
-                  return familiarShoesCard(anotherShoes);
-                }).toList(),
+              child: BlocProvider(
+                create: (context) => ProductBloc()..add(GetPopularProduct()),
+                child: BlocBuilder<ProductBloc, ProductState>(
+                  builder: (context, state) {
+                    if (state is ProductSucces) {
+                      return Row(
+                        children: state.products.map(
+                          (anotherShoes) {
+                            return FamiliarShoesCard(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProductPage(product: anotherShoes),
+                                  ),
+                                );
+                              },
+                              anotherShoes: anotherShoes.galleries[0].url!,
+                            );
+                          },
+                        ).toList(),
+                      );
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -385,6 +408,29 @@ class _ProductPageState extends State<ProductPage> {
           contentFamiliarShoes(),
           contentButtons()
         ],
+      ),
+    );
+  }
+}
+
+class FamiliarShoesCard extends StatelessWidget {
+  final VoidCallback? onTap;
+  final String? anotherShoes;
+
+  const FamiliarShoesCard({super.key, this.onTap, this.anotherShoes});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
+        child: CachedNetworkImage(
+          imageUrl: anotherShoes!,
+          width: 54,
+          height: 54,
+        ),
       ),
     );
   }

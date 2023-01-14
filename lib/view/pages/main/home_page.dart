@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shamo/blocs/auth/auth_bloc.dart';
 import 'package:shamo/models/category_model.dart';
+import 'package:shamo/shared/method.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/view/pages/product_page.dart';
 import 'package:shamo/view/widgets/categories_item.dart';
 import 'package:shamo/view/widgets/popular_item.dart';
 import 'package:shamo/view/widgets/product_item.dart';
@@ -150,13 +152,27 @@ class _HomePageState extends State<HomePage> {
                   create: (context) => ProductBloc()..add(GetPopularProduct()),
                   child: BlocBuilder<ProductBloc, ProductState>(
                     builder: (context, state) {
-                      if (state is ProductFailed) {}
+                      if (state is ProductFailed) {
+                        setState(() {
+                          showSnackbar(context, state.e);
+                        });
+                      }
                       if (state is ProductSucces) {
                         return Row(
                           children: state.products
                               .map(
-                                (popularProduct) =>
-                                    PopularItem(popularProduct: popularProduct),
+                                (popularProduct) => PopularItem(
+                                  popularProduct: popularProduct,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductPage(
+                                            product: popularProduct),
+                                      ),
+                                    );
+                                  },
+                                ),
                               )
                               .toList(),
                         );
@@ -190,16 +206,41 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 14),
-            Column(
-              children: const [
-                ProductItem(),
-                ProductItem(),
-                ProductItem(),
-                ProductItem(),
-                ProductItem(),
-                ProductItem(),
-                ProductItem(),
-              ],
+            BlocProvider(
+              create: (context) => ProductBloc()..add(GetProdcuts()),
+              child: BlocBuilder<ProductBloc, ProductState>(
+                builder: (context, state) {
+                  if (state is ProductFailed) {
+                    setState(() {
+                      showSnackbar(context, state.e);
+                    });
+                  }
+                  if (state is ProductSucces) {
+                    return Column(
+                      children: state.products
+                          .map(
+                            (product) => ProductItem(
+                              product: product,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ProductPage(product: product),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                          .toList(),
+                    );
+                  }
+
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              ),
             )
           ],
         ),

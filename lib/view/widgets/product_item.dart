@@ -1,15 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shamo/shared/theme.dart';
 
+import '../../models/product_model.dart';
+
 class ProductItem extends StatelessWidget {
-  const ProductItem({super.key});
+  final ProductModel product;
+  final VoidCallback? onTap;
+
+  const ProductItem({
+    super.key,
+    required this.product,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/product');
-      },
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(
           bottom: defaultMargin,
@@ -20,7 +28,7 @@ class ProductItem extends StatelessWidget {
             const SizedBox(
               width: 12,
             ),
-            Expanded(child: _productDetail())
+            Expanded(child: _productDetail(),)
           ],
         ),
       ),
@@ -28,36 +36,43 @@ class ProductItem extends StatelessWidget {
   }
 
   Widget _productImage() {
-    return ClipRRect(
+    return SizedBox(
+      width: 120,
+      height: 120,
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          'assets/images/shoes.png',
-          width: 120,
-          height: 120,
+        child: CachedNetworkImage(
+          imageUrl: product.galleries[0].url!,
           fit: BoxFit.cover,
-        ));
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              CircularProgressIndicator(value: downloadProgress.progress),
+          errorWidget: (context, url, error) => const Icon(Icons.error),
+        ),
+      ),
+    );
   }
 
   Widget _productDetail() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        'Football',
+        product.category!.name!,
         style: lightGreyTextStyle.copyWith(
           fontSize: 12,
         ),
       ),
       const SizedBox(height: 6),
       Text(
-        'Predator 20.3 Firm Ground',
+        product.name!,
         style: whiteTextStyle.copyWith(
           fontSize: 16,
           fontWeight: semiBold,
         ),
         maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
       const SizedBox(height: 6),
       Text(
-        '\$68,47',
+        '\$${product.price}',
         style: priceTextStyle.copyWith(
           fontWeight: medium,
         ),

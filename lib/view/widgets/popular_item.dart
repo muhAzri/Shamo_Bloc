@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shamo/shared/theme.dart';
 
@@ -46,11 +47,17 @@ class PopularItem extends StatelessWidget {
   }
 
   Widget _buildProductImage() {
-    return Image.network(
-      popularProduct.galleries[0].url!,
+    
+    return SizedBox(
       width: 215,
       height: 150,
-      fit: BoxFit.cover,
+      child: CachedNetworkImage(
+        imageUrl: popularProduct.galleries[0].url!,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, downloadProgress) =>
+            CircularProgressIndicator(value: downloadProgress.progress),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+      ),
     );
   }
 
