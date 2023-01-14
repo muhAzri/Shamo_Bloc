@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shamo/blocs/auth/auth_bloc.dart';
@@ -25,9 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = CategoryModel(
-      name: 'All Shoes',
-    );
+    selectedCategory = CategoryModel();
     querry.text = 6.toString();
   }
 
@@ -79,9 +79,7 @@ class _HomePageState extends State<HomePage> {
                 );
               }
 
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return Container();
             },
           ),
         ),
@@ -99,13 +97,15 @@ class _HomePageState extends State<HomePage> {
               builder: (context, state) {
                 if (state is CategoriesSuccess) {
                   state.categories.sort((a, b) => b.id - a.id);
-                  selectedCategory = state.categories.first;
+                  if (selectedCategory.name == null) {
+                    selectedCategory = state.categories.first;
+                  }
                   return Row(
                     children: state.categories
                         .map(
                           (category) => CategoriesItem(
                             category: category,
-                            isSelected: selectedCategory == category,
+                            isSelected: selectedCategory.id == category.id,
                             onTap: (category) {
                               setState(
                                 () {
