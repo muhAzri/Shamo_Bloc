@@ -22,6 +22,12 @@ class WishlistProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  removeProduct(ProductModel product) {
+    _wishlist.removeWhere((element) => element.id == product.id);
+
+    notifyListeners();
+  }
+
   isWishlist(ProductModel product) {
     if (_wishlist.indexWhere((element) => element.id == product.id) == -1) {
       return false;

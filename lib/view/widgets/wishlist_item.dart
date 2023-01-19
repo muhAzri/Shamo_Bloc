@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/view/pages/product_page.dart';
 import 'package:shamo/view/widgets/buttons.dart';
 
 import '../../models/product_model.dart';
@@ -35,25 +37,48 @@ class _WishlistItemState extends State<WishlistItem> {
         right: 20,
       ),
       decoration: _containerDecoration(),
-      child: Row(children: [
-        _productImage(),
-        const SizedBox(width: 12),
-        Expanded(child: _productDetail()),
-        const SizedBox(width: 53),
-        _wishlistButton(context)
-      ]),
+      child: Row(
+        children: [
+          _body(),
+          _wishlistButton(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _body() {
+    return Expanded(
+      child: Row(
+        children: [
+          _productImage(),
+          const SizedBox(width: 12),
+          _productDetail(),
+          const SizedBox(width: 53),
+        ],
+      ),
     );
   }
 
   Widget _productImage() {
-    return ClipRRect(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductPage(product: product),
+          ),
+        );
+      },
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          product.galleries[0].url!,
+        child: CachedNetworkImage(
+          imageUrl: product.galleries[0].url!,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _productDetail() {
@@ -82,10 +107,10 @@ class _WishlistItemState extends State<WishlistItem> {
       onTap: () {
         setState(
           () {
-            wishlistProvider.setProduct(product);
+            wishlistProvider.removeProduct(product);
             showWishListSnackbar(
               context,
-              wishlistProvider.isWishlist(product),
+              false,
             );
           },
         );

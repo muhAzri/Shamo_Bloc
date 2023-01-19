@@ -74,7 +74,10 @@ class WishlistPage extends StatelessWidget {
             title: 'Explore Store',
             width: 152,
             height: 44,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/home', (route) => false);
+            },
           )
         ],
       ),
