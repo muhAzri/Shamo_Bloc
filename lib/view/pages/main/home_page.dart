@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shamo/blocs/auth/auth_bloc.dart';
+import 'package:shamo/state_management/blocs/auth/auth_bloc.dart';
 import 'package:shamo/models/category_model.dart';
 import 'package:shamo/shared/method.dart';
 import 'package:shamo/shared/theme.dart';
@@ -11,7 +9,7 @@ import 'package:shamo/view/widgets/categories_item.dart';
 import 'package:shamo/view/widgets/popular_item.dart';
 import 'package:shamo/view/widgets/product_item.dart';
 
-import '../../../blocs/product/product_bloc.dart';
+import '../../../state_management/blocs/product/product_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,8 +25,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = CategoryModel();
-    querry.text = 6.toString();
+    selectedCategory = CategoryModel(
+      id: 6,
+    );
+    if (selectedCategory.id != 6) {
+      querry.text = selectedCategory.id.toString();
+    } else {
+      querry.text = '0';
+    }
   }
 
   @override
@@ -131,21 +135,17 @@ class _HomePageState extends State<HomePage> {
 
     Widget popularProduct() {
       return Container(
-        margin: querry.text != '6'
-            ? EdgeInsets.zero
-            : EdgeInsets.only(top: defaultMargin),
+        margin: EdgeInsets.only(top: defaultMargin),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            querry.text != '6'
-                ? Container()
-                : Text(
-                    'Popular Products',
-                    style: whiteTextStyle.copyWith(
-                      fontSize: 22,
-                      fontWeight: semiBold,
-                    ),
-                  ),
+            Text(
+              'Popular Products',
+              style: whiteTextStyle.copyWith(
+                fontSize: 22,
+                fontWeight: semiBold,
+              ),
+            ),
             Container(
               margin: const EdgeInsets.only(
                 top: 14,
@@ -162,28 +162,24 @@ class _HomePageState extends State<HomePage> {
                         });
                       }
                       if (state is ProductSucces) {
-                        if (querry.text == '6') {
-                          return Row(
-                            children: state.products
-                                .map(
-                                  (popularProduct) => PopularItem(
-                                    popularProduct: popularProduct,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProductPage(
-                                              product: popularProduct),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                )
-                                .toList(),
-                          );
-                        } else {
-                          return Container();
-                        }
+                        return Row(
+                          children: state.products
+                              .map(
+                                (popularProduct) => PopularItem(
+                                  popularProduct: popularProduct,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductPage(
+                                            product: popularProduct),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        );
                       }
                       return const Center(
                         child: CircularProgressIndicator(),
@@ -216,13 +212,13 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 14),
             BlocProvider(
               create: (context) => ProductBloc()..add(GetProdcuts()),
-              child: BlocBuilder<ProductBloc, ProductState>(
-                builder: (context, state) {
+              child: BlocConsumer<ProductBloc, ProductState>(
+                listener: (context, state) {
                   if (state is ProductFailed) {
-                    setState(() {
-                      showSnackbar(context, state.e);
-                    });
+                    showSnackbar(context, state.e);
                   }
+                },
+                builder: (context, state) {
                   if (state is ProductSucces) {
                     return Column(
                       children: state.products
@@ -243,7 +239,6 @@ class _HomePageState extends State<HomePage> {
                           .toList(),
                     );
                   }
-
                   return const Center(
                     child: CircularProgressIndicator(),
                   );

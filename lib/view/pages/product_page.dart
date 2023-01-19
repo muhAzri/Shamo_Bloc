@@ -2,41 +2,28 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:shamo/shared/method.dart';
 
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/wishlist_provider.dart';
 import 'package:shamo/view/widgets/buttons.dart';
-import '../../blocs/product/product_bloc.dart';
 import '../../models/product_model.dart';
+import '../../state_management/blocs/product/product_bloc.dart';
 
 class ProductPage extends StatefulWidget {
   final ProductModel product;
   const ProductPage({super.key, required this.product});
 
   @override
+  // ignore: no_logic_in_create_state
   State<ProductPage> createState() => _ProductPageState(product);
 }
 
 class _ProductPageState extends State<ProductPage> {
   final ProductModel product;
 
-  List images = [
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-  ];
-
-  List familiarShoes = [
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-    'assets/images/shoes.png',
-  ];
-
   int currentIndex = 0;
-  bool isWishlist = false;
 
   _ProductPageState(this.product);
 
@@ -201,6 +188,9 @@ class _ProductPageState extends State<ProductPage> {
 
   Widget content() {
     Widget contentHeader() {
+      WishlistProvider wishlistProvider =
+          Provider.of<WishlistProvider>(context);
+
       return Row(
         children: [
           Expanded(
@@ -225,12 +215,15 @@ class _ProductPageState extends State<ProductPage> {
             ),
           ),
           WishlistButton(
-            isActive: isWishlist,
+            isActive: wishlistProvider.isWishlist(product),
             onTap: () {
               setState(
                 () {
-                  isWishlist = !isWishlist;
-                  showWishListSnackbar(context, isWishlist);
+                  wishlistProvider.setProduct(product);
+                  showWishListSnackbar(
+                    context,
+                    wishlistProvider.isWishlist(product),
+                  );
                 },
               );
             },

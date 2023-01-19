@@ -3,7 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:shamo/models/category_model.dart';
 import 'package:shamo/services/product_service.dart';
 
-import '../../models/product_model.dart';
+import '../../../models/product_model.dart';
+
 
 part 'product_event.dart';
 part 'product_state.dart';

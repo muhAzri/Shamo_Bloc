@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/view/widgets/wishlist_item.dart';
+import '../../../state_management/provider/wishlist_provider.dart';
 import '../../widgets/buttons.dart';
 
 class WishlistPage extends StatelessWidget {
@@ -8,27 +10,33 @@ class WishlistPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    WishlistProvider wishlistProvider = Provider.of<WishlistProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Favorite Shoes'),
       ),
-      body: _buildBody(context),
-      // body: _buildEmptyWishlist(context),
+      body: wishlistProvider.wishlist.isEmpty
+          ? _buildEmptyWishlist(context)
+          : _buildBody(context, wishlistProvider),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildBody(BuildContext context, WishlistProvider provider) {
     return Column(
       children: [
         Expanded(
           child: Container(
             color: backgroundColor3,
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              children: const [
-                WishlistItem(),
-              ],
-            ),
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                children: provider.wishlist
+                    .map(
+                      (wishlist) => WishlistItem(
+                        product: wishlist,
+                      ),
+                    )
+                    .toList()),
           ),
         ),
       ],

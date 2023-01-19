@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/view/widgets/buttons.dart';
 
-class WishlistItem extends StatelessWidget {
-  const WishlistItem({super.key});
+import '../../models/product_model.dart';
+import '../../shared/method.dart';
+import '../../state_management/provider/wishlist_provider.dart';
+
+class WishlistItem extends StatefulWidget {
+  final ProductModel product;
+  const WishlistItem({
+    super.key,
+    required this.product,
+  });
+
+  @override
+  // ignore: no_logic_in_create_state
+  State<WishlistItem> createState() => _WishlistItemState(product);
+}
+
+class _WishlistItemState extends State<WishlistItem> {
+  final ProductModel product;
+
+  _WishlistItemState(this.product);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +40,7 @@ class WishlistItem extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: _productDetail()),
         const SizedBox(width: 53),
-        _wishlistButton()
+        _wishlistButton(context)
       ]),
     );
   }
@@ -29,8 +48,8 @@ class WishlistItem extends StatelessWidget {
   Widget _productImage() {
     return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.asset(
-          'assets/images/shoes.png',
+        child: Image.network(
+          product.galleries[0].url!,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
@@ -40,25 +59,37 @@ class WishlistItem extends StatelessWidget {
   Widget _productDetail() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
-        'Terrex Urban Low',
+        product.name!,
         style: whiteTextStyle.copyWith(fontWeight: semiBold),
       ),
       const SizedBox(height: 2),
       Text(
-        '\$143,98',
+        '\$${product.price}',
         style: priceTextStyle,
       ),
     ]);
   }
 
-  Widget _wishlistButton() {
+  Widget _wishlistButton(context) {
+    WishlistProvider wishlistProvider = Provider.of<WishlistProvider>(context);
+
     return WishlistButton(
       width: 34,
       height: 34,
       iconWidth: 12,
       iconHeight: 10,
       isActive: true,
-      onTap: () {},
+      onTap: () {
+        setState(
+          () {
+            wishlistProvider.setProduct(product);
+            showWishListSnackbar(
+              context,
+              wishlistProvider.isWishlist(product),
+            );
+          },
+        );
+      },
     );
   }
 

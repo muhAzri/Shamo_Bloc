@@ -4,7 +4,7 @@ import 'package:shamo/shared/method.dart';
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/view/widgets/profile_item.dart';
 
-import '../../../../blocs/auth/auth_bloc.dart';
+import '../../../../state_management/blocs/auth/auth_bloc.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

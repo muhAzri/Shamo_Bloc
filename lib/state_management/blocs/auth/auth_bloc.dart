@@ -3,8 +3,9 @@ import 'package:equatable/equatable.dart';
 import 'package:shamo/models/form_model/sign_in_form_model.dart';
 import 'package:shamo/services/auth_service.dart';
 
-import '../../models/form_model/sign_up_form_model.dart';
-import '../../models/user_model.dart';
+import '../../../models/form_model/sign_up_form_model.dart';
+import '../../../models/user_model.dart';
+
 
 part 'auth_event.dart';
 part 'auth_state.dart';

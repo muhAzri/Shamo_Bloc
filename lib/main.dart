@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/wishlist_provider.dart';
 import 'package:shamo/view/pages/cart_page.dart';
 import 'package:shamo/view/pages/checkout_page.dart';
 import 'package:shamo/view/pages/checkout_succes_page.dart';
 import 'package:shamo/view/pages/main/chat/detail_chat_page.dart';
 import 'package:shamo/view/pages/main/main_page.dart';
 import 'package:shamo/view/pages/main/profile/edit_profile_page.dart';
-import 'package:shamo/view/pages/product_page.dart';
 import 'package:shamo/view/pages/sign_in_page.dart';
 import 'package:shamo/view/pages/sign_up_page.dart';
 import 'package:shamo/view/pages/splash_page.dart';
 
-import 'blocs/auth/auth_bloc.dart';
+import 'state_management/blocs/auth/auth_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,20 +31,27 @@ class MyApp extends StatelessWidget {
           create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
         ),
       ],
-      child: MaterialApp(
-        theme: themeData(),
-        debugShowCheckedModeBanner: false,
-        routes: {
-          '/': (context) => const SplashPage(),
-          '/sign-in': (context) => const SignInPage(),
-          '/sign-up': (context) => const SignUpPage(),
-          '/home': (context) => const MainPage(),
-          '/chat': (context) => const DetailChatPage(),
-          '/edit-profile': (context) => const EditProfilePage(),
-          '/cart': (context) => const CartPage(),
-          '/checkout': (context) => const CheckoutPage(),
-          '/checkout-succes': (context) => const CheckoutSuccesPage()
-        },
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => WishlistProvider(),
+          ),
+        ],
+        child: MaterialApp(
+          theme: themeData(),
+          debugShowCheckedModeBanner: false,
+          routes: {
+            '/': (context) => const SplashPage(),
+            '/sign-in': (context) => const SignInPage(),
+            '/sign-up': (context) => const SignUpPage(),
+            '/home': (context) => const MainPage(),
+            '/chat': (context) => const DetailChatPage(),
+            '/edit-profile': (context) => const EditProfilePage(),
+            '/cart': (context) => const CartPage(),
+            '/checkout': (context) => const CheckoutPage(),
+            '/checkout-succes': (context) => const CheckoutSuccesPage()
+          },
+        ),
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:shamo/shared/theme.dart';
 import 'package:shamo/view/widgets/buttons.dart';
 import 'package:shamo/view/widgets/forms.dart';
 
-import '../../blocs/auth/auth_bloc.dart';
+import '../../state_management/blocs/auth/auth_bloc.dart';
 import '../../models/form_model/sign_up_form_model.dart';
 
 class SignUpPage extends StatefulWidget {
