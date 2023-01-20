@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shamo/shared/method.dart';
 
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/cart_provider.dart';
 import 'package:shamo/state_management/provider/wishlist_provider.dart';
 import 'package:shamo/view/widgets/buttons.dart';
 import '../../models/product_model.dart';
@@ -94,7 +95,9 @@ class _ProductPageState extends State<ProductPage> {
                     title: 'View My Cart',
                     height: 44,
                     width: 154,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/cart');
+                    },
                   )
                 ],
               ),
@@ -335,6 +338,7 @@ class _ProductPageState extends State<ProductPage> {
     }
 
     Widget contentButtons() {
+      CartProvider cartProvider = Provider.of<CartProvider>(context);
       return Container(
         margin: EdgeInsets.symmetric(
           vertical: defaultMargin,
@@ -371,6 +375,7 @@ class _ProductPageState extends State<ProductPage> {
                 title: 'Add to Cart',
                 height: 54,
                 onPressed: () {
+                  cartProvider.addProduct(product);
                   showSuccesDialog();
                 },
               ),

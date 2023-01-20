@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shamo/view/widgets/cart_item.dart';
 
 import '../../shared/theme.dart';
+import '../../state_management/provider/cart_provider.dart';
 import '../widgets/buttons.dart';
 
 class CartPage extends StatelessWidget {
@@ -9,6 +11,7 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CartProvider cartProvider = Provider.of<CartProvider>(context);
     AppBar header() {
       return AppBar(
         title: const Text(
@@ -58,20 +61,20 @@ class CartPage extends StatelessWidget {
       );
     }
 
-    Widget content() {
+    Widget content(CartProvider cartProvider) {
       return ListView(
         padding: const EdgeInsets.all(30),
-        children: const [
-          CartItem(),
-          CartItem(),
-          CartItem(),
-          CartItem(),
-          CartItem(),
-        ],
+        children: cartProvider.carts
+            .map(
+              (cart) => CartItem(
+                cart: cart,
+              ),
+            )
+            .toList(),
       );
     }
 
-    Widget customBottomNav() {
+    Widget customBottomNav(CartProvider cartProvider) {
       return Container(
         margin: const EdgeInsets.only(top: 10),
         height: 200,
@@ -90,7 +93,7 @@ class CartPage extends StatelessWidget {
                     style: whiteTextStyle,
                   ),
                   Text(
-                    '\$287,96',
+                    "\$${cartProvider.totalPrice()}",
                     style: priceTextStyle.copyWith(
                         fontSize: 16, fontWeight: semiBold),
                   )
@@ -153,8 +156,10 @@ class CartPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: backgroundColor3,
       appBar: header(),
-      body: content(),
-      bottomNavigationBar: customBottomNav(),
+      body: cartProvider.carts.isEmpty ? emptyCart() : content(cartProvider),
+      bottomNavigationBar: cartProvider.carts.isEmpty
+          ? const SizedBox()
+          : customBottomNav(cartProvider),
     );
   }
 }

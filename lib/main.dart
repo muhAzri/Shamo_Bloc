@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/cart_provider.dart';
 import 'package:shamo/state_management/provider/wishlist_provider.dart';
 import 'package:shamo/view/pages/cart_page.dart';
 import 'package:shamo/view/pages/checkout_page.dart';
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(
             create: (context) => WishlistProvider(),
           ),
+          ChangeNotifierProvider(
+            create: (context) => CartProvider(),
+          )
         ],
         child: MaterialApp(
           theme: themeData(),

@@ -1,11 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/models/cart_model.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/cart_provider.dart';
+
+import '../../models/product_model.dart';
 
 class CartItem extends StatelessWidget {
-  const CartItem({super.key});
+  final CartModel cart;
+  const CartItem({super.key, required this.cart});
 
   @override
   Widget build(BuildContext context) {
+    CartProvider cartProvider = Provider.of<CartProvider>(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -15,21 +24,21 @@ class CartItem extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildTopRow(),
+          _buildTopRow(cartProvider),
           const SizedBox(height: 12),
-          _buildRemoveRow(),
+          _buildRemoveRow(cartProvider),
         ],
       ),
     );
   }
 
-  Widget _buildTopRow() {
+  Widget _buildTopRow(CartProvider cartProvider) {
     return Row(
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
-            'assets/images/shoes.png',
+          child: CachedNetworkImage(
+            imageUrl: cart.product!.galleries[0].url!,
             width: 60,
             height: 60,
           ),
@@ -40,7 +49,7 @@ class CartItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Terrex Urban Low',
+                cart.product!.name!,
                 style: whiteTextStyle.copyWith(
                   fontWeight: semiBold,
                 ),
@@ -50,7 +59,7 @@ class CartItem extends StatelessWidget {
                 height: 2,
               ),
               Text(
-                '\$143,98',
+                '\$${cart.product!.price}',
                 style: priceTextStyle,
               ),
             ],
@@ -58,12 +67,12 @@ class CartItem extends StatelessWidget {
         ),
         Column(
           children: [
-            _buildAddButton(),
+            _buildAddButton(cartProvider),
             const SizedBox(
               height: 2,
             ),
             Text(
-              '2',
+              cart.quantity.toString(),
               style: whiteTextStyle.copyWith(
                 fontWeight: medium,
               ),
@@ -71,64 +80,79 @@ class CartItem extends StatelessWidget {
             const SizedBox(
               height: 2,
             ),
-            _buildRemoveButton(),
+            _buildRemoveButton(cartProvider),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildAddButton() {
-    return Container(
-      width: 16,
-      height: 16,
-      decoration: BoxDecoration(
-        color: purpleColor,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.add,
-        size: 14,
-        color: whiteColor,
+  Widget _buildAddButton(CartProvider cartProvider) {
+    return GestureDetector(
+      onTap: () {
+        cartProvider.addQuantity(cart.id!);
+      },
+      child: Container(
+        width: 16,
+        height: 16,
+        decoration: BoxDecoration(
+          color: purpleColor,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          Icons.add,
+          size: 14,
+          color: whiteColor,
+        ),
       ),
     );
   }
 
-  Widget _buildRemoveButton() {
-    return Container(
-      width: 16,
-      height: 16,
-      decoration: const BoxDecoration(
-        color: Color(0xff3F4251),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.remove,
-        size: 14,
-        color: whiteColor,
+  Widget _buildRemoveButton(CartProvider cartProvider) {
+    return GestureDetector(
+      onTap: () {
+        cartProvider.reduceQuantity(cart.id!);
+      },
+      child: Container(
+        width: 16,
+        height: 16,
+        decoration: const BoxDecoration(
+          color: Color(0xff3F4251),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          Icons.remove,
+          size: 14,
+          color: whiteColor,
+        ),
       ),
     );
   }
 
-  Widget _buildRemoveRow() {
-    return Row(
-      children: [
-        Image.asset(
-          'assets/icons/remove.png',
-          width: 10,
-          height: 12,
-        ),
-        const SizedBox(
-          width: 4,
-        ),
-        Text(
-          'Remove',
-          style: alertTextStyle.copyWith(
-            fontSize: 12,
-            fontWeight: light,
+  Widget _buildRemoveRow(CartProvider cartProvider) {
+    return GestureDetector(
+      onTap: () {
+        cartProvider.removeCart(cart.id!);
+      },
+      child: Row(
+        children: [
+          Image.asset(
+            'assets/icons/remove.png',
+            width: 10,
+            height: 12,
           ),
-        )
-      ],
+          const SizedBox(
+            width: 4,
+          ),
+          Text(
+            'Remove',
+            style: alertTextStyle.copyWith(
+              fontSize: 12,
+              fontWeight: light,
+            ),
+          )
+        ],
+      ),
     );
   }
 }
