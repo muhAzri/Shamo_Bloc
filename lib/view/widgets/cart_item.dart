@@ -5,7 +5,6 @@ import 'package:shamo/models/cart_model.dart';
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/state_management/provider/cart_provider.dart';
 
-import '../../models/product_model.dart';
 
 class CartItem extends StatelessWidget {
   final CartModel cart;

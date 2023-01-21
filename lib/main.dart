@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/blocs/transaction/transaction_bloc.dart';
 import 'package:shamo/state_management/provider/cart_provider.dart';
 import 'package:shamo/state_management/provider/wishlist_provider.dart';
 import 'package:shamo/view/pages/cart_page.dart';
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
         ),
+        BlocProvider(
+          create: (context) => TransactionBloc(),
+        )
       ],
       child: MultiProvider(
         providers: [

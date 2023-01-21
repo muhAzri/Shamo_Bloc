@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:shamo/shared/method.dart';
 import 'package:shamo/shared/theme.dart';
+import 'package:shamo/state_management/provider/cart_provider.dart';
 import 'package:shamo/view/widgets/buttons.dart';
 import 'package:shamo/view/widgets/checkout_item.dart';
+
+import '../../state_management/blocs/transaction/transaction_bloc.dart';
 
 class CheckoutPage extends StatelessWidget {
   const CheckoutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundColor3,
-      appBar: _buildAppBar(),
-      body: _buildContent(context),
+    CartProvider cartProvider = Provider.of<CartProvider>(context);
+
+    return BlocConsumer<TransactionBloc, TransactionState>(
+      listener: (context, state) {
+        if (state is TransactionSuccess) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/checkout-succes', (route) => false);
+          cartProvider.removeAllCart();
+        }
+
+        if (state is TransactionFailed) {
+          showSnackbar(context, state.e);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: backgroundColor3,
+          appBar: _buildAppBar(),
+          body: _buildContent(context, cartProvider),
+        );
+      },
     );
   }
 
@@ -26,15 +49,15 @@ class CheckoutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, CartProvider cartProvider) {
     return ListView(
       padding: const EdgeInsets.all(30),
       children: [
         _buildListHeader(),
-        _buildCheckoutItems(),
+        _buildCheckoutItems(context, cartProvider),
         _buildAddressDetails(),
-        _buildPaymentSummary(),
-        _buildButton(context),
+        _buildPaymentSummary(cartProvider),
+        _buildButton(context, cartProvider),
       ],
     );
   }
@@ -49,12 +72,15 @@ class CheckoutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckoutItems() {
+  Widget _buildCheckoutItems(BuildContext context, CartProvider cartProvider) {
     return Column(
-      children: const [
-        CheckoutItem(),
-        CheckoutItem(),
-      ],
+      children: cartProvider.carts
+          .map(
+            (cart) => CheckoutItem(
+              cart: cart,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -141,7 +167,7 @@ class CheckoutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentSummary() {
+  Widget _buildPaymentSummary(CartProvider cartProvider) {
     return Container(
       margin: const EdgeInsets.only(top: 30),
       padding: const EdgeInsets.all(20),
@@ -172,7 +198,7 @@ class CheckoutPage extends StatelessWidget {
                 ),
               ),
               Text(
-                '2 Items',
+                '${cartProvider.totalItems()} Items',
                 style: whiteTextStyle.copyWith(
                   fontWeight: medium,
                 ),
@@ -192,7 +218,7 @@ class CheckoutPage extends StatelessWidget {
                 ),
               ),
               Text(
-                '\$575.96',
+                '\$${cartProvider.totalPrice()}',
                 style: whiteTextStyle.copyWith(
                   fontWeight: medium,
                 ),
@@ -237,7 +263,7 @@ class CheckoutPage extends StatelessWidget {
                 style: priceTextStyle.copyWith(fontWeight: semiBold),
               ),
               Text(
-                '\$575.92',
+                '\$${cartProvider.totalPrice()}',
                 style: priceTextStyle.copyWith(
                   fontWeight: semiBold,
                 ),
@@ -249,7 +275,7 @@ class CheckoutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(BuildContext context) {
+  Widget _buildButton(BuildContext context, CartProvider cartProvider) {
     return Container(
       margin: const EdgeInsets.only(top: 30),
       child: Column(
@@ -264,12 +290,24 @@ class CheckoutPage extends StatelessWidget {
           CustomButton(
             title: 'Checkout Now',
             onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/checkout-succes', (route) => false);
+              context.read<TransactionBloc>().add(
+                    TransactionPOST(
+                      cartProvider.carts,
+                      cartProvider.totalPrice(),
+                    ),
+                  );
             },
           ),
         ],
       ),
     );
+  }
+
+  bool isSuccess(BuildContext context, CartProvider cartProvider) {
+    try {
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

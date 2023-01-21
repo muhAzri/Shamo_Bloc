@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shamo/models/cart_model.dart';
 import 'package:shamo/shared/theme.dart';
 
 class CheckoutItem extends StatelessWidget {
-  const CheckoutItem({super.key});
+  final CartModel cart;
+  const CheckoutItem({super.key, required this.cart});
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +44,8 @@ class CheckoutItem extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return Image.asset(
-      'assets/images/shoes.png',
+    return CachedNetworkImage(
+      imageUrl: cart.product!.galleries[0].url!,
       width: 60,
       height: 60,
     );
@@ -50,7 +53,7 @@ class CheckoutItem extends StatelessWidget {
 
   Widget _buildName() {
     return Text(
-      'Terrex Urban Low',
+      cart.product!.name!,
       style: whiteTextStyle.copyWith(
         fontWeight: semiBold,
       ),
@@ -60,14 +63,14 @@ class CheckoutItem extends StatelessWidget {
 
   Widget _buildPrice() {
     return Text(
-      '\$143,98',
+      '\$${cart.product!.price!}',
       style: priceTextStyle,
     );
   }
 
   Widget _buildQuantity() {
     return Text(
-      '2 Items',
+      '${cart.quantity} Items',
       style: lightGreyTextStyle.copyWith(
         fontSize: 12,
       ),

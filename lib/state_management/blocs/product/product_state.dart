@@ -17,7 +17,7 @@ class ProductFailed extends ProductState {
   const ProductFailed(this.e);
 
   @override
-  List<Object> get props => ['e'];
+  List<Object> get props => [e];
 }
 
 class CategoriesSuccess extends ProductState {
@@ -26,7 +26,7 @@ class CategoriesSuccess extends ProductState {
   const CategoriesSuccess(this.categories);
 
   @override
-  List<Object> get props => ['categories'];
+  List<Object> get props => [categories];
 }
 
 class ProductSucces extends ProductState {
@@ -35,7 +35,7 @@ class ProductSucces extends ProductState {
   const ProductSucces(this.products);
 
   @override
-  List<Object> get props => ['products'];
+  List<Object> get props => [products];
 
   
 }

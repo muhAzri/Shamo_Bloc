@@ -35,6 +35,11 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
+   removeAllCart() {
+    _carts = [];
+    notifyListeners();
+  }
+
   addQuantity(int id) {
     _carts[id].quantity++;
     notifyListeners();
