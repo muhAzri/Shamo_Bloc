@@ -8,11 +8,10 @@ abstract class TransactionEvent extends Equatable {
 }
 
 class TransactionPOST extends TransactionEvent {
-  final List<CartModel> carts;
-  final double totalPrice;
+  final CheckoutFormModel checkoutFormModel;
 
-  const TransactionPOST(this.carts, this.totalPrice);
+  const TransactionPOST(this.checkoutFormModel);
 
   @override
-  List<Object> get props => [carts,totalPrice];
+  List<Object> get props => [checkoutFormModel];
 }

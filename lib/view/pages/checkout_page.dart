@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:shamo/models/form_model/checkout_form_model.dart';
 import 'package:shamo/shared/method.dart';
 import 'package:shamo/shared/theme.dart';
 import 'package:shamo/state_management/provider/cart_provider.dart';
@@ -292,8 +293,13 @@ class CheckoutPage extends StatelessWidget {
             onPressed: () {
               context.read<TransactionBloc>().add(
                     TransactionPOST(
-                      cartProvider.carts,
-                      cartProvider.totalPrice(),
+                      CheckoutFormModel(
+                        items: cartProvider.carts
+                            .map((cart) => ItemModel(
+                                id: cart.product!.id!, quantity: cart.quantity))
+                            .toList(),
+                        totalPrice: cartProvider.totalPrice(),
+                      ),
                     ),
                   );
             },

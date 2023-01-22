@@ -2,45 +2,29 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shamo/models/form_model/checkout_form_model.dart';
 import 'package:shamo/shared/values.dart';
 
-import '../models/cart_model.dart';
-
 class TransactionService {
-  Future checkout(List<CartModel> carts, double totalPrice) async {
+  Future checkout(CheckoutFormModel checkoutFormModel) async {
     try {
       final token = await getToken();
 
-      final body = jsonEncode(
-        {
-          'address': 'Kota Cimahi',
-          'items': carts
-              .map(
-                (cart) => {
-                  'id': cart.product!.id,
-                  'quantity': cart.quantity,
-                },
-              )
-              .toList(),
-          'status': 'PENDING',
-          'total_price': totalPrice,
-          'shipping_price': 100,
-        },
-      );
+      
 
       final res = await http.post(
         Uri.parse(
           "$baseUrl/checkout",
         ),
         headers: {'Accept': 'application/json', 'Authorization': token},
-        body: body,
+        body: jsonEncode(checkoutFormModel.toJson()),
       );
 
       if (res.statusCode == 200) {
         return true;
       }
 
-      return true;
+      return false;
     } catch (e) {
       rethrow;
     }
